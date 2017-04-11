@@ -1,0 +1,223 @@
+.stats{
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  text-align: right;
+  font-size: 25px;
+  color: #337ab7;
+}
+.stats tr{
+  height: 60px;
+}
+#total_transactions{
+  font-weight: bold;
+}
+
+#received_bills{
+  font-weight: bold;
+}
+
+#approved_bills{
+  font-weight: bold;
+}
+
+#partially_approved_bills{
+  font-weight: bold;
+}
+
+#rejected_bills{
+  font-weight: bold;
+}
+
+#paid_bills{
+  font-weight: bold;;
+}
+
+.division{
+  border-bottom: 2px solid #337ab7;
+}
+
+.window{
+  height: 160px;
+  border: 1px solid transparent;
+}
+
+.left_arrow{
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right:10px solid #337ab7;
+  margin-top: 69px;
+  float: left;
+}
+
+.right_arrow{
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid #337ab7;
+  margin-top: 69px;
+  float: right;
+}
+
+.blocks{
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.line{
+  height: 0;
+  border-top: 4px solid #337ab7;
+  margin-top: 77px;
+}
+
+.block_holder{
+  /*width: 1254px;*/
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  margin-top:-52px;
+  height: 100px;
+}
+
+.block_scroll{
+  width: 30000px;
+  height: 100px;
+}
+
+.individual_block{
+  width: 100px;
+  height: 100px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border: 2px solid #337ab7;
+  background-color: #ffffff;
+  display:inline-block;
+}
+
+.block_transition_right{
+  width: 300px;
+  height: 100px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border: 2px solid #337ab7;
+  background-color: #337ab7;
+  display:inline-block;
+}
+
+.block_header{
+  height: 96px;
+  width: 100%;
+  display: table;
+}
+
+.block_header div{
+  display:table-cell;
+  vertical-align:middle;
+  text-align:center;
+}
+
+.block_content{
+  width: 300px;
+  border: 2px solid #337ab7;
+  margin-left: -2px;
+  position:absolute;
+  text-align: left;
+  font-size: 15px;
+  color: #337ab7;
+  padding: 5px;
+  line-height: 20px;
+  margin-bottom: 20px;
+}
+
+.individual_block.partially_approved{
+  border: 2px solid #7ab785;
+  color: #7ab785;
+}
+
+.individual_block.approved{
+  border: 2px solid #048219;
+  color: #048219;
+}
+
+.individual_block.rejected{
+  border: 2px solid #ea1e1e;
+  color: #ea1e1e;
+}
+
+.individual_block.received{
+  border: 2px solid #e6a100;
+  color: #e6a100;
+}
+
+.individual_block.paid{
+  border: 2px solid #000000;
+  color: #000000;
+}
+
+.block_transition_right.partially_approved{
+  border: 2px solid #7ab785;
+  background-color: #7ab785;
+  color: #ffffff;
+}
+
+.block_transition_right.approved{
+  border: 2px solid #048219;
+  background-color: #048219;
+  color: #ffffff;
+}
+
+.block_transition_right.rejected{
+  border: 2px solid #ea1e1e;
+  background-color: #ea1e1e;
+  color: #ffffff;
+}
+
+.block_transition_right.received{
+  border: 2px solid #e6a100;
+  background-color: #e6a100;
+  color: #ffffff;
+}
+
+.block_transition_right.paid{
+  border: 2px solid #000000;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.partially_approved .block_content{
+  border: 2px solid #7ab785;
+  color: #7ab785;
+}
+
+.approved .block_content{
+  border: 2px solid #048219;
+  color: #048219;
+}
+
+.rejected .block_content{
+  border: 2px solid #ea1e1e;
+  color: #ea1e1e;
+}
+
+.received .block_content{
+  border: 2px solid #e6a100;
+  color: #e6a100;
+}
+
+.paid .block_content{
+  border: 2px solid #000000;
+  color: #000000;
+}
+
+.modal-dialog{
+    /* 80% of window height */
+    height: 500px;
+    width: 80%;
+}
+.modal-body{
+  width: 100%;
+  height: 400px;
+}

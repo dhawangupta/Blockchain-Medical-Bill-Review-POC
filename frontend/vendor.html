@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row bg-primary">
+    <nav class="navbar navbar-default">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="chain.html">Blockchain Medical Bill Review</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li><a href="#" id="user"><span class="glyphicon glyphicon-user" style="margin-right:4px;"></span></a></li>
+          <li><p class="navbar-text" id="role"></p></li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Filter status
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="Approved">Approved</a></li>
+              <li><a href="#" id="Partially_approved">Partially approved</a></li>
+              <li><a href="#" id="Rejected">Rejected</a></li>
+              <li><a href="#" id="Received">Received</a></li>
+              <li><a href="#" id="Paid">Paid</a></li>
+              <li><a href="#" id="None">None</a></li>
+            </ul>
+          </li>
+          <li><a href="#" id="pay_bill">Process Payment</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right" style="margin-right:100px;">
+          <li><a href="login.html"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        </ul>
+    </nav>
+  </div>
+
+<div id="blockchain">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Entity</th>
+        <th>Role</th>
+        <th>Claim Id</th>
+        <th>Bill Id</th>
+        <th>Operation</th>
+        <th>Bill Status</th>
+        <th>Amount Claimed</th>
+        <th>Amount Approved</th>
+        <th>Comments</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="ledger">
+    </tbody>
+  </table>
+</div>
+
+<div id="list_of_pay_bills">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Role</th>
+        <th>Claim Id</th>
+        <th>Bill Id</th>
+        <th>Approver</th>
+        <th>Role</th>
+        <th>Operation</th>
+        <th>Bill Status</th>
+        <th>Amount Claimed</th>
+        <th>Amount Approved</th>
+        <th>Comments</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="list">
+    </tbody>
+  </table>
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Process Bill Payment</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="">Provider Name:</label><span id="provider_name"></span>
+        </div>
+        <div class="form-group">
+          <label for="">Claim Id:</label><span id="claim_id"></span>
+        </div>
+        <div class="form-group">
+          <label for="">Bill Id:</label><span id="bill_id"></span>
+        </div>
+        <div class="form-group">
+          <label for="">Bill Amount:</label><span id="bill_amount"></span>
+        </div>
+        <div class="form-group">
+          <label for="">Approver Name:</label><span id="approver_name"></span>
+        </div>
+        <div class="form-group">
+          <label for="">Bill Status:</label><span id="bill_status"></span>
+        </div>
+        <div class="form-group">
+          <label for="">Amount to be paid:</label><span id="pay_amount"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button  tabindex="1" class="btn btn-primary" id="pay_button">Process Payment</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+  var user;
+  user = localStorage.getItem("enrollid");
+  document.getElementById("user").innerHTML += localStorage.getItem("entity_name");
+  //document.getElementById("role").innerHTML = localStorage.getItem("entity_role");
+  document.getElementById("role").innerHTML = "Payment Vendor";
+
+  $.ajax({
+    type: 'POST',
+    dataType: 'json',
+
+    data: JSON.stringify({
+      jsonrpc: "2.0",
+      method: "query",
+      params: {
+        type: 1,
+        chaincodeID: {
+          name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+        },
+        ctorMsg: {
+          function: "get_count",
+          args: [
+          ]
+        },
+        secureContext: user
+      },
+      id: 0
+    }),
+    contentType: 'application/json',
+    crossDomain: true,
+    url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+    success: function(d) {
+    //  alert(JSON.stringify(d));
+      //alert(d.result.message);
+      count = parseInt(d.result.message);
+      localStorage.setItem("precount",count);
+      for (i=count; i>0; i--){
+        var j = i.toString();
+        var newentry = '<tr id="'+j+'"></tr>';
+        $('#ledger').append(newentry);
+      }
+      //alert(count);
+      for (i=count; i>0; i--){
+        var j = i.toString();
+        //alert(j);
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          indexValue: i,
+          data: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "query",
+            params: {
+              type: 1,
+              chaincodeID: {
+                name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+              },
+              ctorMsg: {
+                function: "get_transaction",
+                args: [ j
+                ]
+              },
+              secureContext: user
+            },
+            id: 0
+          }),
+          contentType: 'application/json',
+          crossDomain: true,
+          url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+          success: function(d) {
+            //alert(JSON.stringify(d));
+            //alert( d.result.message);
+            var result = JSON.parse( d.result.message);
+            var cls = result.bill_status;
+            if(cls == "Partially approved"){
+              cls = "Partially_approved";
+            }
+            var status = result.operation;
+            if(result.operation =='Submit'){
+              status = "Create";
+            }
+            if (result.operation == "Pay"){
+              status = "Process Payment";
+            }
+            var billjson = JSON.parse(result.bill_details);
+            var element_id = "#"+this.indexValue;
+            var newentry = '<td>'+result.entity_involved.entity_name+'</td>'+
+                           '<td>'+result.entity_involved.entity_role+'</td>'+
+                           '<td>'+result.claim_id+'</td>'+
+                           '<td>'+result.bill_id+'</td>'+
+                           '<td>'+status+'</td>'+
+                           '<td>'+result.bill_status+'</td>'+
+                           '<td>'+billjson.amount_claimed+'</td>'+
+                           '<td>'+billjson.amount_approved+'</td>'+
+                           '<td>'+billjson.reason+'</td>'+
+                           '<td>'+result.date+'</td>';
+            $(element_id).append(newentry);
+            $(element_id).addClass(cls);
+
+          },
+          error: function(e)
+          {
+                alert("Error while loading the result");
+                //alert(JSON.stringify(e));
+          }
+        });
+      }
+    },
+    error: function(e)
+    {
+          alert("Error while loading the result");
+          //alert(JSON.stringify(e));
+    }
+  });
+
+  $('#Approved').on('click',function(){
+    $('.Approved').show();
+    $('.Partially_approved').hide();
+    $('.Received').hide();
+    $('.Rejected').hide();
+    $('.Paid').hide();
+  });
+
+  $('#Partially_approved').on('click',function(){
+    $('.Approved').hide();
+    $('.Partially_approved').show();
+    $('.Received').hide();
+    $('.Rejected').hide();
+    $('.Paid').hide();
+  });
+
+  $('#Received').on('click',function(){
+    $('.Approved').hide();
+    $('.Partially_approved').hide();
+    $('.Received').show();
+    $('.Rejected').hide();
+    $('.Paid').hide();
+  });
+
+  $('#Rejected').on('click',function(){
+    $('.Approved').hide();
+    $('.Partially_approved').hide();
+    $('.Received').hide();
+    $('.Rejected').show();
+    $('.Paid').hide();
+  });
+
+  $('#Paid').on('click',function(){
+    $('.Approved').hide();
+    $('.Partially_approved').hide();
+    $('.Received').hide();
+    $('.Rejected').hide();
+    $('.Paid').show();
+  });
+
+  $('#None').on('click',function(){
+    $('.Approved').show();
+    $('.Partially_approved').show();
+    $('.Received').show();
+    $('.Rejected').show();
+    $('.Paid').show();
+  });
+
+
+  $('#list_of_pay_bills').hide();
+
+  $('#user').on('click',function(){
+    $('#list_of_pay_bills').hide();
+    $('#blockchain').show();
+  });
+
+  $('#pay_bill').on('click',function(){
+    $('#blockchain').hide();
+    $('#list').empty();
+    $('#list_of_pay_bills').show();
+
+    var vendor = localStorage.getItem("entity_name");
+      //alert(vendor);
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+
+      data: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "query",
+        params: {
+          type: 1,
+          chaincodeID: {
+            name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+          },
+          ctorMsg: {
+            function: "get_to_be_paid_bills",
+            args: [
+              vendor
+            ]
+          },
+          secureContext: user
+        },
+        id: 0
+      }),
+      contentType: 'application/json',
+      crossDomain: true,
+      url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+      success: function(d) {
+          //alert(JSON.stringify(d));
+        //alert( d.result.message);
+        var list = JSON.parse( d.result.message);
+        for (i=0;i<list.length;i++){
+          var bill = JSON.parse(list[i].bill_details);
+          var newentry ='<tr onclick="pay_individual_bill(event)">'+
+                        '<td>'+list[i].provider_name+'</td>'+
+                        '<td>'+list[i].provider_role+'</td>'+
+                        '<td>'+list[i].claim_id+'</td>'+
+                        '<td>'+list[i].bill_id+'</td>'+
+                        '<td>'+list[i].approver_name+'</td>'+
+                        '<td>'+list[i].approver_role+'</td>'+
+                        '<td>'+list[i].operation+'</td>'+
+                        '<td>'+list[i].bill_status+'</td>'+
+                        '<td>'+bill.amount_claimed+'</td>'+
+                        '<td>'+bill.amount_approved+'</td>'+
+                        '<td>'+bill.reason+'</td>'+
+                        '<td>'+list[i].date+'</td>'+
+                        '<tr>';
+          $('#list').prepend(newentry);
+        }
+
+      },
+      error: function(e)
+      {
+            alert("Error while loading the result");
+            //alert(JSON.stringify(e));
+      }
+    });
+
+  });
+
+  var selected_bill;
+  var operation = 'Pay';
+  var i, bill_status;
+  var bill,bill_details;
+  var cells;
+  var provider_name, approver_name;
+  var provider_role, approver_role;
+  var claim_id;
+  var bill_id;
+
+  function pay_individual_bill(e){
+    $('#myModal').modal('show');
+    selected_bill = null;
+    selected_bill = e.target.parentNode;
+    cells = selected_bill.getElementsByTagName("td");
+    provider_name = cells[0].innerText;
+    provider_role = cells[1].innerText;
+    claim_id = cells[2].innerText;
+    bill_id = cells[3].innerText;
+    approver_name = cells[4].innerText;
+    bill_status = cells[7].innerText;
+    bill = {amount_claimed:cells[8].innerText, amount_approved:cells[9].innerText, reason:cells[10].innerText};
+    bill_details = JSON.stringify(bill);
+    document.getElementById('provider_name').innerHTML = provider_name;
+    document.getElementById('claim_id').innerHTML = claim_id;
+    document.getElementById('bill_id').innerHTML = bill_id;
+    document.getElementById('bill_amount').innerHTML = cells[8].innerText;
+    document.getElementById('approver_name').innerHTML = approver_name;
+    document.getElementById('bill_status').innerHTML = bill_status;
+    document.getElementById('pay_amount').innerHTML = cells[9].innerText;
+    //alert(bill_details);
+  }
+
+  $('#pay_button').on('click',function(){
+    $.ajax({
+         type: 'POST',
+         dataType: 'json',
+
+         data: JSON.stringify({
+           jsonrpc: "2.0",
+           method: "invoke",
+           params: {
+             type: 1,
+             chaincodeID: {
+               name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+             },
+             ctorMsg: {
+               function: "transact",
+               args: [
+                 user, claim_id, bill_id, operation, bill_details, "Paid", provider_name, provider_role
+               ]
+             },
+             secureContext: user
+           },
+           id: 0
+         }),
+         contentType: 'application/json',
+         crossDomain: true,
+         url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+         success: function(d) {
+           //(JSON.stringify(d));
+           alert("Bill sucessfully paid");
+           $('#myModal').modal('hide');
+           selected_bill.remove();
+         },
+         error: function(e)
+         {
+               alert("Error while processing the payment");
+               //alert(JSON.stringify(e));
+         }
+     });
+
+  });
+
+
+  function update(){
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      data: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "query",
+        params: {
+          type: 1,
+          chaincodeID: {
+            name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+          },
+          ctorMsg: {
+            function: "get_count",
+            args: [
+            ]
+          },
+          secureContext: user
+        },
+        id: 0
+      }),
+      contentType: 'application/json',
+      crossDomain: true,
+      url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+      success: function(d) {
+      //  alert(JSON.stringify(d));
+        //alert(d.result.message);
+        count = parseInt(d.result.message);
+        precount = parseInt(localStorage.getItem("precount"));
+        //alert(precount);
+        //alert(count);
+        //alert(precount+1);
+        if(count>precount){
+          for (i=precount+1; i<=count; i++){
+            var j = i.toString();
+            var newentry = '<tr id="'+j+'"></tr>';
+            $('#ledger').prepend(newentry);
+          }
+          for (i=precount+1; i<=count; i++){
+            var j = i.toString();
+            //alert(j);
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              indexValue: i,
+              data: JSON.stringify({
+                jsonrpc: "2.0",
+                method: "query",
+                params: {
+                  type: 1,
+                  chaincodeID: {
+                    name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+                  },
+                  ctorMsg: {
+                    function: "get_transaction",
+                    args: [ j
+                    ]
+                  },
+                  secureContext: user
+                },
+                id: 0
+              }),
+              contentType: 'application/json',
+              crossDomain: true,
+              url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+              success: function(d) {
+                //alert(JSON.stringify(d));
+                //alert( d.result.message);
+                var result = JSON.parse( d.result.message);
+                var cls = result.bill_status;
+                if(cls == "Partially approved"){
+                  cls = "Partially_approved";
+                }
+                var status = result.operation;
+                if(result.operation =='Submit'){
+                  status = "Create";
+                }
+                if (result.operation == "Pay"){
+                  status = "Process Payment";
+                }
+                var billjson = JSON.parse(result.bill_details);
+                var element_id = "#"+this.indexValue;
+                var newentry = '<td>'+result.entity_involved.entity_name+'</td>'+
+                               '<td>'+result.entity_involved.entity_role+'</td>'+
+                               '<td>'+result.claim_id+'</td>'+
+                               '<td>'+result.bill_id+'</td>'+
+                               '<td>'+status+'</td>'+
+                               '<td>'+result.bill_status+'</td>'+
+                               '<td>'+billjson.amount_claimed+'</td>'+
+                               '<td>'+billjson.amount_approved+'</td>'+
+                               '<td>'+billjson.reason+'</td>'+
+                               '<td>'+result.date+'</td>';
+                $(element_id).append(newentry);
+                $(element_id).addClass(cls);
+
+              },
+              error: function(e)
+              {
+                    alert("Error while updating the result");
+                    //alert(JSON.stringify(e));
+              }
+            });
+          }
+        }
+        localStorage.setItem("precount",count);
+      },
+      error: function(e)
+      {
+            alert("Error while updating the result");
+            //alert(JSON.stringify(e));
+      }
+    });
+  }
+  setInterval("update()",5000);
+</script>
+</body>
+</html>

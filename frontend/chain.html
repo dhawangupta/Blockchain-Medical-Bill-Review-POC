@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <link rel="stylesheet" href="css/chain.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="js/chain.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row bg-primary" >
+  <nav class="navbar navbar-default">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Blockchain Medical Bill Review</a>
+      </div>
+      <ul class="nav navbar-nav navbar-right" style="margin-right:100px;">
+        <li><a href="login.html"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      </ul>
+      <div class="navbar-form navbar-right">
+        <div class="form-group">
+          <input type="text" id="search_bill_id" class="form-control" placeholder="Enter Bill Id">
+        </div>
+        <button  id="search" class="btn btn-default" data-toggle="modal" data-target="#search_results">Search</button>
+      </div>
+  </nav>
+  </div>
+<div class="row container stats">
+  <table class="col-lg-12">
+      <tr>
+        <td class="col-lg-4">Total Transactions<br><span id="total_transactions">0</span></td>
+        <td class="col-lg-4" style="color:#e6a100">Received Bills<br><span id="received_bills">0</span></td>
+        <td class="col-lg-4" style="color:#048219">Approved Bills<br><span id="approved_bills">0</span></td>
+      </tr>
+      <tr>
+        <td class="col-lg-4" style="color:#7ab785">Partially Approved Bills<br><span id="partially_approved_bills">0</span></td>
+        <td class="col-lg-4" style="color:#ea1e1e">Rejected Bills<br><span id="rejected_bills">0</span></td>
+        <td class="col-lg-4" style="color:#000000">Paid Bills<br><span id="paid_bills">0</span></td>
+      </tr>
+  </table>
+</div>
+<div class="division"></div>
+<div id='ledger'>
+  <div class="window">
+    <div class="left_arrow"></div>
+    <div class="right_arrow"> </div>
+    <div class="blocks">
+      <div class="line"></div>
+      <div class="block_holder">
+        <div class="block_scroll">
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="search_results" class="modal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        Search Results
+      </div>
+       <div class="modal-body">
+         <div class="window">
+           <div class="left_arrow"></div>
+           <div class="right_arrow"> </div>
+           <div class="blocks">
+             <div class="line"></div>
+             <div class="block_holder">
+               <div class="block_scroll">
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+       <div class="modal-footer" style="text-align:left;">
+         <div style="display:inline-block; margin-left:10px;"><div style="background-color:#e6a100; width:8px; height:8px; display:inline-block; margin-right:4px;"></div><div style="display:inline-block;">Received</div></div>
+         <div style="display:inline-block; margin-left:10px;"><div style="background-color:#048219; width:8px; height:8px; display:inline-block; margin-right:4px;"></div><div style="display:inline-block;">Approved</div></div>
+         <div style="display:inline-block; margin-left:10px;"><div style="background-color:#7ab785; width:8px; height:8px; display:inline-block; margin-right:4px;"></div><div style="display:inline-block;">Partially Approved</div></div>
+         <div style="display:inline-block; margin-left:10px;"><div style="background-color:#ea1e1e; width:8px; height:8px; display:inline-block; margin-right:4px;"></div><div style="display:inline-block;">Rejected</div></div>
+         <div style="display:inline-block; margin-left:10px;"><div style="background-color:#000000; width:8px; height:8px; display:inline-block; margin-right:4px;"></div><div style="display:inline-block;">Paid</div></div>
+       </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+//admin
+localStorage.setItem("Admin", "admin");
+localStorage.setItem("admin", "d18a003f9f");
+//crawford
+localStorage.setItem("Crawford", "user_type1_0");
+localStorage.setItem("crawford", "61c014a975");
+//payment vendor1
+localStorage.setItem("PaymentVendor1", "user_type1_1");
+localStorage.setItem("paymentvendor1", "ba88b84c89");
+//payment vendor2
+localStorage.setItem("PaymentVendor2", "user_type1_2");
+localStorage.setItem("paymentvendor2", "212372af98");
+//provider1
+localStorage.setItem("Provider1", "user_type1_3");
+localStorage.setItem("provider1", "a38ea0f7b7");
+//provider2
+localStorage.setItem("Provider2", "user_type1_4");
+localStorage.setItem("provider2", "f5e8949d3d");
+//approver1
+localStorage.setItem("Approver1", "user_type2_0");
+localStorage.setItem("approver1", "243b4b5bb3");
+//approver2
+localStorage.setItem("Approver2", "user_type2_1");
+localStorage.setItem("approver2", "893a32aa62");
+
+</script>
+</body>
+</html>

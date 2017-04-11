@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row bg-primary" >
+  <nav class="navbar navbar-default">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="chain.html">Blockchain Medical Bill Review</a>
+      </div>
+  </nav>
+  </div>
+  <div class="row">
+			<div class="col-md-6 col-md-offset-3">
+				<div class="panel panel-primary" style="margin-top:25px;" >
+          <div class="panel-heading">Login
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="enrollid">User Id:</label>
+						  <input type="text"  id="enrollid" tabindex="1" class="form-control" placeholder="User Id">
+						</div>
+						<div class="form-group">
+              <label for="password">User Password:</label>
+							<input type="password"  id="enrollpass" tabindex="2" class="form-control" placeholder="User Password">
+						</div>
+            <div class="form-group">
+						  <button onclick="login()" tabindex="3" class="btn btn-primary">Login</button>
+						</div>
+          </div>
+          <!--<div class="panel-footer">
+            <a href="register.html">Register</a>
+          </div>-->
+        </div>
+      </div>
+  </div>
+
+</div>
+<script>
+function login(){
+  //alert('infunction');
+  var userid = document.getElementById('enrollid').value;
+  var usersecret = document.getElementById('enrollpass').value;
+
+  var enrollid = localStorage.getItem(userid);
+  var enrollsecret = localStorage.getItem(usersecret);
+  //alert(enrollid+"-"+enrollsecret);
+  $.ajax({
+  		type: 'POST',
+  		dataType: 'json',
+
+  		data: JSON.stringify({
+        enrollId: enrollid,
+        enrollSecret: enrollsecret
+      }),
+  		contentType: 'application/json',
+  		crossDomain: true,
+  		url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/registrar',
+  		success: function(d) {
+        //alert(JSON.stringify(d));
+        if (typeof(Storage) !== "undefined") {
+          localStorage.setItem("enrollid", enrollid);
+          //document.getElementById("result").innerHTML = localStorage.getItem("enrollid");
+        } else {
+          document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Storage...";
+        }
+        $.ajax({
+        		type: 'POST',
+        		dataType: 'json',
+
+        		data: JSON.stringify({
+              jsonrpc: "2.0",
+              method: "query",
+              params: {
+                type: 1,
+                chaincodeID: {
+                  name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+                },
+                ctorMsg: {
+                  function: "get_user",
+                  args: [ enrollid
+                  ]
+                },
+                secureContext: enrollid
+              },
+              id: 0
+            }),
+        		contentType: 'application/json',
+        		crossDomain: true,
+        		url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+        		success: function(d) {
+              //alert(JSON.stringify(d));
+              var entity = JSON.parse( d.result.message);
+              var entity_name = entity.entity_name;
+              var entity_role = entity.entity_role;
+              //alert(entity_name);
+              localStorage.setItem("entity_name", entity_name);
+              //alert(localStorage.getItem("entity_name"));
+              localStorage.setItem("entity_role", entity_role);
+              //alert(localStorage.getItem("entity_role"));
+              if(localStorage.getItem("entity_role")=='admin'){
+                window.location.href = 'register.html';
+              }
+              if(localStorage.getItem("entity_role")=='Provider'){
+                window.location.href = 'provider.html';
+              }
+              if(localStorage.getItem("entity_role")=='Approver'){
+                window.location.href = 'approver.html';
+              }
+              if(localStorage.getItem("entity_role")=='Vendor'){
+                window.location.href = 'vendor.html';
+              }
+        		},
+        		error: function(e)
+        		{
+                	alert("Error loging in");
+                  //alert(JSON.stringify(e));
+        		}
+        });
+  		},
+  		error: function(e)
+  		{
+          	alert("Error loging in");
+            //alert(JSON.stringify(e));
+  		}
+  });
+}
+</script>
+</body>
+</html>

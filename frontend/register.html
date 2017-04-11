@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row bg-primary">
+    <nav class="navbar navbar-default">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="chain.html">Blockchain Medical Bill Review</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li><a href="#" id="result"><span class="glyphicon glyphicon-user" style="margin-right:4px;"></span></a></li>
+          <li><a href="chain.html">Blockchain view</a></li>
+        </ul>
+    </nav>
+  </div>
+  <div class="row">
+			<div class="col-md-6 col-md-offset-3">
+				<div class="panel panel-primary" style="margin-top:25px;" >
+          <div class="panel-heading">Register
+          </div>
+          <div class="panel-body" id="panel">
+            <div class="form-group">
+              <label for="enrollid">User Id:</label>
+						  <input type="text"  id="enrollid" tabindex="1" class="form-control" placeholder="User Id">
+						</div>
+						<div class="form-group">
+              <label for="username">Name:</label>
+							<input type="text"  id="username" tabindex="2" class="form-control" placeholder="Name">
+						</div>
+            <div class="form-group">
+              <label>Select Role:</label>
+              <div class="radio">
+                <label><input type="radio" tabindex="3" name ="role"  value="Provider" id="Provider">Provider</label>
+              </div>
+              <div class="form-group" id="assign_vendor">
+                <label for="select_vendor">Select a Payment Vendor to assign to the Provider:</label>
+                <select class="form-control" id="select_vendor"  tabindex="4">
+                  <option>Payment Vendor - 1</option>
+                  <option>Payment Vendor - 2</option>
+                </select>
+              </div>
+              <div class="radio">
+                <label><input type="radio" tabindex="5" name ="role"  value="Vendor">Payment Vendor</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" tabindex="6" name ="role"  value="Approver">Approver</label>
+              </div>
+						</div>
+            <div class="form-group">
+						  <button onclick="register()" tabindex="7" class="btn btn-primary">Register</button>
+						</div>
+          </div>
+          <!--<div class="panel-footer">
+            <a href="login.html">Login</a>
+          </div>-->
+        </div>
+      </div>
+  </div>
+</div>
+<script>
+
+
+//$(document).ready(function () {
+
+  $("#assign_vendor").hide();
+  $("input[name='role']").click(function () {
+      var  checkedValue = $("input[name='role']:checked").val();
+      //console.log(checkedValue);
+      if (checkedValue == "Provider") {
+          $("#assign_vendor").show();
+      } else {
+          $("#assign_vendor").hide();
+      }
+  });
+//});
+
+  document.getElementById("result").innerHTML += localStorage.getItem("entity_name");
+
+  function register(){
+    //alert('infunction');
+    var enrollid = document.getElementById('enrollid').value;
+    var name = document.getElementById('username').value;
+    var x = document.getElementsByName("role");
+    var i, role;
+    for (i = 0; i < x.length; i++) {
+        if (x[i].checked == true) {
+          role = x[i].value;
+        }
+    }
+    //alert(role);
+    if(role == 'Provider'){
+      var vendor =  $('#select_vendor').find(":selected").text();
+      //alert(vendor);
+      $.ajax({
+      		type: 'POST',
+      		dataType: 'json',
+      		data: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "invoke",
+            params: {
+              type: 1,
+              chaincodeID: {
+                name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+              },
+              ctorMsg: {
+                function: "register",
+                args: [
+                  enrollid, name, role, vendor
+                ]
+              },
+              secureContext: "admin"
+            },
+            id: 0
+        }),
+      		contentType: 'application/json',
+      		crossDomain: true,
+      		url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+      		success: function(d) {
+            //alert(JSON.stringify(d));
+            alert("Sucessfully registered "+role);
+            document.getElementById('enrollid').value = "";
+            document.getElementById('username').value = "";
+            document.getElementById('select_vendor').selectedIndex = "0";
+            $("#assign_vendor").hide();
+            var x = document.getElementsByName('role');
+            var i;
+            for(i =0; i<x.length; i++){
+              //alert("hello");
+              x[i].checked = false;
+            }
+      		},
+      		error: function(e)
+      		{
+              	alert("Error while registering");
+                //alert(JSON.stringify(e));
+      		}
+      });
+
+    }else{
+      $.ajax({
+      		type: 'POST',
+      		dataType: 'json',
+
+      		data: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "invoke",
+            params: {
+              type: 1,
+              chaincodeID: {
+                name: "e7013fe7664a3b52743c0daf075972d011c883a8d4de75a5b5d93e7b064b7e4cd438960e89d7440ef4658e198f316e64e326dbbba333225837d7de8f7fdeeba9"
+              },
+              ctorMsg: {
+                function: "register",
+                args: [
+                  enrollid, name, role
+                ]
+              },
+              secureContext: "admin"
+            },
+            id: 0
+          }),
+      		contentType: 'application/json',
+      		crossDomain: true,
+      		url: 'https://013148a355384b06820606ca19eb5374-vp0.us.blockchain.ibm.com:5003/chaincode',
+      		success: function(d) {
+            //alert(JSON.stringify(d));
+            alert("Sucessfully registered "+role);
+
+            //$(".panel-body").trigger("reset");
+            document.getElementById('enrollid').value = "";
+            document.getElementById('username').value = "";
+            document.getElementById('select_vendor').selectedIndex = "0";
+            $("#assign_vendor").hide();
+            var x = document.getElementsByName('role');
+            var i;
+            for(i =0; i<x.length; i++){
+              //alert("hello");
+              x[i].checked = false;
+            }
+            /*$('#panel').find(':input').each(function() {
+              alert('hello');
+              var type = this.type;
+              alert(type);
+              var tag = this.tagName.toLowerCase(); // normalize case
+              // it's ok to reset the value attr of text inputs,
+              // password inputs, and textareas
+              if (type == 'text' || type == 'password' || tag == 'textarea')
+                this.value = "";
+              // checkboxes and radios need to have their checked state cleared
+              // but should *not* have their 'value' changed
+              else if (type == 'checkbox' || type == 'radio')
+                this.checked = false;
+              // select elements need to have their 'selectedIndex' property set to -1
+              // (this works for both single and multiple select elements)
+              else if (tag == 'select')
+                this.selectedIndex = 0;
+            });*/
+      		},
+      		error: function(e)
+      		{
+              	alert("Error while registering");
+                //alert(JSON.stringify(e));
+      		}
+        });
+      }
+
+  }
+</script>
+</body>
+</html>
