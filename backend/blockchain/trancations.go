@@ -45,6 +45,12 @@ type Entity struct{
 	Entity_Role string `json:"entity_role"`
 }
 
+type Struct_Bill_Details struct{
+	Amount_claimed int `json:"amount_claimed"`
+	Amount_approved int `json:"amount_approved"`
+	Reason string `json:"reason"`
+}
+
 type Transaction struct{
 	Entity_Involved Entity `json:"entity_involved"`
 	Claim_Id string `json:"claim_id"`
@@ -156,6 +162,7 @@ func (t *SimpleChaincode) register(stub shim.ChaincodeStubInterface, args []stri
 
 
 func (t *SimpleChaincode) transact(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+		
 	if len(args) < 6{
 		return nil, errors.New("Incorrect number of arguments while transacting.")
 	}
@@ -175,7 +182,8 @@ func (t *SimpleChaincode) transact(stub shim.ChaincodeStubInterface, args []stri
 	tr.Bill_Id = args[2]
 	tr.Operation = args[3]
 	tr.Bill_Details = args[4]
-	tr.Bill_Status = args[5]
+	tr.Bill_Status = args[5] 
+	var b Struct_Bill_Details 
 	// This date is used to indicate the layout.
   const layout = "02-Jan-2006 15:04:05"
     // Format Now with the layout const.
@@ -194,15 +202,19 @@ func (t *SimpleChaincode) transact(stub shim.ChaincodeStubInterface, args []stri
 				&shim.Column{Value: &shim.Column_String_{String_: tr.Date}},
 			},
 		})
+		
+		err = json.Unmarshal([]byte (tr.Bill_Details),&b) 
+				
 		if (!bool && err == nil){
 			return nil, errors.New("already submitted")
 		}
 		if (!bool && err != nil){
 			return  nil, errors.New("could not insert row in to_be_validated_bills")
 		}
+		
 	}
 
-	if (tr.Operation == "Validate") {
+	if (tr.Operation == "Validate" ) {
 		var provider_name, provider_role string
 		provider_name = args[6]
 		provider_role = args[7]
@@ -288,6 +300,19 @@ func (t *SimpleChaincode) transact(stub shim.ChaincodeStubInterface, args []stri
 	if err != nil {
 			 return nil, err
 	}
+	
+	if(tr.Operation=="Submit" &&  b.Amount_claimed<=100){
+		
+		args[0] = "Crawford"
+		args[3] = "Validate"
+		args[4] = "{\"amount_claimed\":"+ strconv.Itoa(b.Amount_claimed)+
+				",\"amount_approved\":"+ strconv.Itoa(b.Amount_claimed)+
+				",\"reason\": \"Auto-approved\"}"
+		args[5] = "Approved"
+		
+		t.transact(stub, args)
+	}
+	
 	return nil,nil
 }
 
