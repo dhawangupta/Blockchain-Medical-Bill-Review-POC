@@ -46,8 +46,8 @@ type Entity struct{
 }
 
 type Struct_Bill_Details struct{
-	Amount_claimed int `json:"amount_claimed"`
-	Amount_approved int `json:"amount_approved"`
+	Amount_claimed string `json:"amount_claimed"`
+	Amount_approved string `json:"amount_approved"`
 	Reason string `json:"reason"`
 }
 
@@ -301,16 +301,22 @@ func (t *SimpleChaincode) transact(stub shim.ChaincodeStubInterface, args []stri
 			 return nil, err
 	}
 	
-	if(tr.Operation=="Submit" &&  b.Amount_claimed<=100){
+	var amount, _ = strconv.Atoi(b.Amount_claimed)
+	
+	if(tr.Operation=="Submit" &&  amount <=100){
 		
 		args[0] = "Crawford"
 		args[3] = "Validate"
-		args[4] = "{\"amount_claimed\":"+ strconv.Itoa(b.Amount_claimed)+
-				",\"amount_approved\":"+ strconv.Itoa(b.Amount_claimed)+
+		args[4] = "{\"amount_claimed\":"+ b.Amount_claimed+
+				",\"amount_approved\":"+ b.Amount_claimed+
 				",\"reason\": \"Auto-approved\"}"
 		args[5] = "Approved"
 		
-		t.transact(stub, args)
+		_,err:= t.transact(stub, args)
+		if(err!=nil){
+		return nil, errors.New("error in auto-approving")
+		}
+		
 	}
 	
 	return nil,nil
